@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.unasp.comanda_digital.controller")
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
