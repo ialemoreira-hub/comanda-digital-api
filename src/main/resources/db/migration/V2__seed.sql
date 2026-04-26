@@ -1,7 +1,6 @@
 -- Admin padrão (senha: senha123 em BCrypt)
 INSERT INTO usuario (nome, email, senha_hash, perfil, status) VALUES
-('Admin', 'admin@email.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH', 'ADMIN', 'ATIVO');
-
+('Admin', 'admin@email.com', '$2a$10$/x227lWSX0v.DRX4uZ9qjee8BUuhtbRPePnNjehk7d/4yR.8fJJGe', 'ADMIN', 'ATIVO');
 -- Categorias
 INSERT INTO categoria (nome, descricao, ordem, status) VALUES
 ('Entradas', 'Petiscos e entradas', 1, 'ATIVO'),
