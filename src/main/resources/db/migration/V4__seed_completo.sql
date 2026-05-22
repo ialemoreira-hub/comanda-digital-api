@@ -28,7 +28,7 @@ INSERT INTO categoria (nome, descricao, ordem, status) VALUES
     ('Lanches', 'Hambúrgueres e sanduíches', 5, 'ATIVO');
 
 INSERT INTO prato (categoria_id, nome, descricao, preco_venda, tempo_preparo_min, status) VALUES
-                                                                                              ((SELECT id FROM categoria WHERE nome = 'Entradas'), 'Bruschetta Especial', 'Bruschetta com queijo e tomate seco', 24.90, 10, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Entradas'), 'Bruschetta', 'Bruschetta com queijo e tomate seco', 24.90, 10, 'ATIVO'),
                                                                                               ((SELECT id FROM categoria WHERE nome = 'Pratos Principais'), 'Salmão ao Maracujá', 'Salmão grelhado com molho de maracujá', 69.90, 30, 'ATIVO'),
                                                                                               ((SELECT id FROM categoria WHERE nome = 'Pratos Principais'), 'Lasanha', 'Lasanha à bolonhesa gratinada', 52.90, 40, 'ATIVO'),
                                                                                               ((SELECT id FROM categoria WHERE nome = 'Bebidas'), 'Limonada Suíça', 'Limonada cremosa com leite condensado', 16.90, 10, 'ATIVO'),
