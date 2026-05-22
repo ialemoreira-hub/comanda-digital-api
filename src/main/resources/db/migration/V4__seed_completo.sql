@@ -23,112 +23,198 @@ INSERT INTO ingrediente (nome, sku, unidade_padrao, estoque_minimo, custo_unitar
                                                                                                 ('Suco de Fruta', 'ING027', 'ML', 500.000, 0.0150, 'ATIVO'),
                                                                                                 ('Refrigerante', 'ING028', 'ML', 500.000, 0.0080, 'ATIVO');
 
--- Fichas técnicas dos pratos originais
--- Prato 1: Bruschetta
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (1, 1, 'Toste o pão, adicione tomate picado, manjericão e azeite.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (1, 7, 2.000, 'UN', 1.00),   -- Pão Italiano
-                                                                                                           (1, 2, 0.100, 'KG', 1.10),   -- Tomate
-                                                                                                           (1, 8, 5.000, 'G', 1.00),    -- Manjericão
-                                                                                                           (1, 9, 20.000, 'ML', 1.00);  -- Azeite
+-- Novas categorias e pratos
+INSERT INTO categoria (nome, descricao, ordem, status) VALUES
+    ('Lanches', 'Hambúrgueres e sanduíches', 5, 'ATIVO');
 
--- Prato 2: Frango Grelhado
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (2, 1, 'Tempere o frango e grelhe em fogo médio.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (2, 3, 0.300, 'KG', 1.10),   -- Frango
-                                                                                                           (2, 10, 5.000, 'G', 1.00),   -- Alho
-                                                                                                           (2, 9, 15.000, 'ML', 1.00);  -- Azeite
+INSERT INTO prato (categoria_id, nome, descricao, preco_venda, tempo_preparo_min, status) VALUES
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Entradas'), 'Bruschetta Especial', 'Bruschetta com queijo e tomate seco', 24.90, 10, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Pratos Principais'), 'Salmão ao Maracujá', 'Salmão grelhado com molho de maracujá', 69.90, 30, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Pratos Principais'), 'Lasanha', 'Lasanha à bolonhesa gratinada', 52.90, 40, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Bebidas'), 'Limonada Suíça', 'Limonada cremosa com leite condensado', 16.90, 10, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Bebidas'), 'Suco Natural 500ml', 'Laranja, maracujá ou abacaxi - feito na hora', 14.90, 10, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Bebidas'), 'Refrigerante 350ml', 'Coca-Cola, Guaraná ou Soda', 7.90, 1, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Lanches'), 'Hambúrguer Artesanal', 'Blend bovino, queijo cheddar e alface', 39.90, 20, 'ATIVO'),
+                                                                                              ((SELECT id FROM categoria WHERE nome = 'Lanches'), 'Chicken Burger', 'Frango grelhado, queijo e alface', 34.90, 20, 'ATIVO');
 
--- Prato 3: Picanha na Brasa
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (3, 1, 'Tempere a picanha e asse na brasa. Sirva com arroz e farofa.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (3, 4, 0.350, 'KG', 1.10),   -- Picanha
-                                                                                                           (3, 11, 0.100, 'KG', 1.00),  -- Arroz
-                                                                                                           (3, 12, 0.050, 'KG', 1.00);  -- Farofa
+-- Fichas técnicas usando subqueries
+-- Bruschetta
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Toste o pão, adicione tomate picado, manjericão e azeite.' FROM prato WHERE nome = 'Bruschetta';
 
--- Prato 4: Pudim
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (4, 1, 'Misture os ingredientes e leve ao forno em banho-maria.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (4, 5, 1.000, 'UN', 1.00),   -- Leite Condensado
-                                                                                                           (4, 6, 0.200, 'L', 1.00),    -- Creme de Leite
-                                                                                                           (4, 14, 3.000, 'UN', 1.00);  -- Ovo
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING007'), 2.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Bruschetta';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING002'), 0.100, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Bruschetta';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING008'), 5.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Bruschetta';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING009'), 20.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Bruschetta';
 
--- Prato 12: Hambúrguer Artesanal
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (12, 1, 'Monte o hambúrguer com pão, carne, queijo, alface e tomate.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (5, 21, 1.000, 'UN', 1.00),  -- Pão de Hambúrguer
-                                                                                                           (5, 20, 0.180, 'KG', 1.10),  -- Carne Moída
-                                                                                                           (5, 22, 30.000, 'G', 1.00),  -- Queijo Cheddar
-                                                                                                           (5, 23, 20.000, 'G', 1.00),  -- Alface
-                                                                                                           (5, 2, 0.050, 'KG', 1.10);   -- Tomate
+-- Frango Grelhado
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Tempere o frango e grelhe em fogo médio.' FROM prato WHERE nome = 'Frango Grelhado';
 
--- Prato 13: Chicken Burger
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (13, 1, 'Monte o hambúrguer de frango com pão, queijo e alface.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (6, 21, 1.000, 'UN', 1.00),  -- Pão de Hambúrguer
-                                                                                                           (6, 24, 0.180, 'KG', 1.10),  -- Frango Hambúrguer
-                                                                                                           (6, 22, 30.000, 'G', 1.00),  -- Queijo Cheddar
-                                                                                                           (6, 23, 20.000, 'G', 1.00);  -- Alface
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING003'), 0.300, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Frango Grelhado';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING010'), 5.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Frango Grelhado';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING009'), 15.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Frango Grelhado';
 
--- Prato 14: Limonada Suíça
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (14, 1, 'Bata o limão com leite condensado e água com gás.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (7, 25, 3.000, 'UN', 1.00),  -- Limão
-                                                                                                           (7, 5, 0.100, 'UN', 1.00),   -- Leite Condensado
-                                                                                                           (7, 26, 200.000, 'ML', 1.00); -- Água com Gás
+-- Picanha na Brasa
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Tempere a picanha e asse na brasa. Sirva com arroz e farofa.' FROM prato WHERE nome = 'Picanha na Brasa';
 
--- Prato 15: Suco Natural 500ml
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (15, 1, 'Bata a fruta com água e coe.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-    (8, 27, 500.000, 'ML', 1.00); -- Suco de Fruta
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING004'), 0.350, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Picanha na Brasa';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING011'), 0.100, 'KG', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Picanha na Brasa';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING012'), 0.050, 'KG', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Picanha na Brasa';
 
--- Prato 16: Refrigerante 350ml
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (16, 1, 'Sirva gelado.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-    (9, 28, 350.000, 'ML', 1.00); -- Refrigerante
+-- Pudim
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Misture os ingredientes e leve ao forno em banho-maria.' FROM prato WHERE nome = 'Pudim';
 
--- Prato 18: Salmão ao Maracujá
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (18, 1, 'Grelhe o salmão e sirva com molho de maracujá.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (10, 15, 0.250, 'KG', 1.10),  -- Salmão
-                                                                                                           (10, 16, 2.000, 'UN', 1.00),  -- Maracujá
-                                                                                                           (10, 9, 15.000, 'ML', 1.00);  -- Azeite
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING005'), 1.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Pudim';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING006'), 0.200, 'L', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Pudim';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING014'), 3.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Pudim';
 
--- Prato 19: Lasanha
-INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo) VALUES (19, 1, 'Monte a lasanha em camadas e asse no forno.');
-INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao) VALUES
-                                                                                                           (11, 17, 0.200, 'KG', 1.00),  -- Massa de Lasanha
-                                                                                                           (11, 20, 0.200, 'KG', 1.10),  -- Carne Moída
-                                                                                                           (11, 18, 0.200, 'KG', 1.00),  -- Molho de Tomate
-                                                                                                           (11, 19, 0.150, 'KG', 1.00);  -- Queijo Mussarela
+-- Hambúrguer Artesanal
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Monte o hambúrguer com pão, carne, queijo, alface e tomate.' FROM prato WHERE nome = 'Hambúrguer Artesanal';
 
--- Estoque inicial para todos os ingredientes
-INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id) VALUES
-                                                                                                            (1, 'ENTRADA', 10.000, 'COMPRA', 4.5000, 1),
-                                                                                                            (2, 'ENTRADA', 5.000, 'COMPRA', 6.0000, 1),
-                                                                                                            (3, 'ENTRADA', 8.000, 'COMPRA', 15.0000, 1),
-                                                                                                            (4, 'ENTRADA', 6.000, 'COMPRA', 80.0000, 1),
-                                                                                                            (5, 'ENTRADA', 10.000, 'COMPRA', 5.5000, 1),
-                                                                                                            (6, 'ENTRADA', 5.000, 'COMPRA', 4.0000, 1),
-                                                                                                            (7, 'ENTRADA', 20.000, 'COMPRA', 2.0000, 1),
-                                                                                                            (8, 'ENTRADA', 200.000, 'COMPRA', 0.1000, 1),
-                                                                                                            (9, 'ENTRADA', 500.000, 'COMPRA', 0.0500, 1),
-                                                                                                            (10, 'ENTRADA', 200.000, 'COMPRA', 0.0200, 1),
-                                                                                                            (11, 'ENTRADA', 10.000, 'COMPRA', 3.5000, 1),
-                                                                                                            (12, 'ENTRADA', 5.000, 'COMPRA', 4.0000, 1),
-                                                                                                            (13, 'ENTRADA', 5.000, 'COMPRA', 3.0000, 1),
-                                                                                                            (14, 'ENTRADA', 30.000, 'COMPRA', 0.8000, 1),
-                                                                                                            (15, 'ENTRADA', 3.000, 'COMPRA', 60.0000, 1),
-                                                                                                            (16, 'ENTRADA', 10.000, 'COMPRA', 1.5000, 1),
-                                                                                                            (17, 'ENTRADA', 3.000, 'COMPRA', 8.0000, 1),
-                                                                                                            (18, 'ENTRADA', 3.000, 'COMPRA', 5.0000, 1),
-                                                                                                            (19, 'ENTRADA', 2.000, 'COMPRA', 35.0000, 1),
-                                                                                                            (20, 'ENTRADA', 3.000, 'COMPRA', 25.0000, 1),
-                                                                                                            (21, 'ENTRADA', 30.000, 'COMPRA', 1.5000, 1),
-                                                                                                            (22, 'ENTRADA', 500.000, 'COMPRA', 0.1500, 1),
-                                                                                                            (23, 'ENTRADA', 500.000, 'COMPRA', 0.0200, 1),
-                                                                                                            (24, 'ENTRADA', 3.000, 'COMPRA', 18.0000, 1),
-                                                                                                            (25, 'ENTRADA', 20.000, 'COMPRA', 0.5000, 1),
-                                                                                                            (26, 'ENTRADA', 2000.000, 'COMPRA', 0.0100, 1),
-                                                                                                            (27, 'ENTRADA', 2000.000, 'COMPRA', 0.0150, 1),
-                                                                                                            (28, 'ENTRADA', 2000.000, 'COMPRA', 0.0080, 1);
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING021'), 1.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Hambúrguer Artesanal';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING020'), 0.180, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Hambúrguer Artesanal';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING022'), 30.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Hambúrguer Artesanal';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING023'), 20.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Hambúrguer Artesanal';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING002'), 0.050, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Hambúrguer Artesanal';
+
+-- Chicken Burger
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Monte o hambúrguer de frango com pão, queijo e alface.' FROM prato WHERE nome = 'Chicken Burger';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING021'), 1.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Chicken Burger';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING024'), 0.180, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Chicken Burger';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING022'), 30.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Chicken Burger';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING023'), 20.000, 'G', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Chicken Burger';
+
+-- Limonada Suíça
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Bata o limão com leite condensado e água com gás.' FROM prato WHERE nome = 'Limonada Suíça';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING025'), 3.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Limonada Suíça';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING005'), 0.100, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Limonada Suíça';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING026'), 200.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Limonada Suíça';
+
+-- Suco Natural 500ml
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Bata a fruta com água e coe.' FROM prato WHERE nome = 'Suco Natural 500ml';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING027'), 500.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Suco Natural 500ml';
+
+-- Refrigerante 350ml
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Sirva gelado.' FROM prato WHERE nome = 'Refrigerante 350ml';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING028'), 350.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Refrigerante 350ml';
+
+-- Salmão ao Maracujá
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Grelhe o salmão e sirva com molho de maracujá.' FROM prato WHERE nome = 'Salmão ao Maracujá';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING015'), 0.250, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Salmão ao Maracujá';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING016'), 2.000, 'UN', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Salmão ao Maracujá';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING009'), 15.000, 'ML', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Salmão ao Maracujá';
+
+-- Lasanha
+INSERT INTO ficha_tecnica (prato_id, rendimento, modo_preparo)
+SELECT id, 1, 'Monte a lasanha em camadas e asse no forno.' FROM prato WHERE nome = 'Lasanha';
+
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING017'), 0.200, 'KG', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Lasanha';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING020'), 0.200, 'KG', 1.10 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Lasanha';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING018'), 0.200, 'KG', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Lasanha';
+INSERT INTO ficha_tecnica_item (ficha_tecnica_id, ingrediente_id, quantidade, unidade, fator_correcao)
+SELECT ft.id, (SELECT id FROM ingrediente WHERE sku = 'ING019'), 0.150, 'KG', 1.00 FROM ficha_tecnica ft JOIN prato p ON ft.prato_id = p.id WHERE p.nome = 'Lasanha';
+
+-- Estoque inicial
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 10.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING001';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 5.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING002';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 8.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING003';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 6.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING004';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 10.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING005';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 5.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING006';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 20.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING007';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 200.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING008';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 500.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING009';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 200.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING010';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 10.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING011';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 5.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING012';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 5.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING013';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 30.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING014';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 3.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING015';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 10.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING016';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 3.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING017';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 3.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING018';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 2.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING019';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 3.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING020';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 30.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING021';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 500.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING022';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 500.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING023';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 3.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING024';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 20.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING025';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 2000.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING026';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 2000.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING027';
+INSERT INTO estoque_movimentacao (ingrediente_id, tipo, quantidade, motivo, custo_unitario, usuario_id)
+SELECT id, 'ENTRADA', 2000.000, 'COMPRA', custo_unitario, (SELECT id FROM usuario WHERE email = 'admin@email.com') FROM ingrediente WHERE sku = 'ING028';
