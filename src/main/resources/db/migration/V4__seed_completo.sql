@@ -1,5 +1,5 @@
 -- Novos ingredientes
-INSERT INTO ingrediente (nome, sku, unidade_padrao, estoque_minimo, custo_unitario, status) VALUES
+INSERT IGNORE INTO ingrediente (nome, sku, unidade_padrao, estoque_minimo, custo_unitario, status) VALUES
                                                                                                 ('Pão Italiano', 'ING007', 'UN', 5.000, 2.0000, 'ATIVO'),
                                                                                                 ('Manjericão', 'ING008', 'G', 50.000, 0.1000, 'ATIVO'),
                                                                                                 ('Azeite', 'ING009', 'ML', 200.000, 0.0500, 'ATIVO'),
